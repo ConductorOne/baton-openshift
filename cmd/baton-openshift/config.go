@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-
 	"github.com/conductorone/baton-sdk/pkg/field"
 	"github.com/spf13/viper"
 )

@@ -44,7 +44,7 @@ func main() {
 
 func getConnector(ctx context.Context, v *viper.Viper) (types.ConnectorServer, error) {
 	l := ctxzap.Extract(ctx)
-	if err := ValidateConfig(ctx, v); err != nil {
+	if err := ValidateConfig(v); err != nil {
 		return nil, err
 	}
 
