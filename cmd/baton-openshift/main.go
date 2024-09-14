@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/conductorone/baton-openshift/pkg/connector"
 	"github.com/conductorone/baton-sdk/pkg/config"
 	"github.com/conductorone/baton-sdk/pkg/connectorbuilder"
 	"github.com/conductorone/baton-sdk/pkg/field"
 	"github.com/conductorone/baton-sdk/pkg/types"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"github.com/spf13/viper"
-	"github.com/conductorone/baton-openshift/pkg/connector"
 	"go.uber.org/zap"
 )
 
