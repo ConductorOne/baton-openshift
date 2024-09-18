@@ -10,7 +10,7 @@ var (
 	// connector to run. Note: these fields can be marked as optional or
 	// required.
 	ConfigurationFields = []field.SchemaField{
-		field.StringField("namespace", field.WithRequired(true))
+		field.StringField("namespace", field.WithRequired(true)),
 	}
 
 	// FieldRelationships defines relationships between the fields listed in
