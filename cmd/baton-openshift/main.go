@@ -13,6 +13,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 var version = "dev"
@@ -45,10 +46,15 @@ func main() {
 func getConnector(ctx context.Context, v *viper.Viper) (types.ConnectorServer, error) {
 	l := ctxzap.Extract(ctx)
 	if err := ValidateConfig(v); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("invalid configuration: %v", err)
 	}
 
-	cb, err := connector.New(ctx)
+	config, err := clientcmd.BuildConfigFromFlags("", v.GetString(kubeConfig.FieldName))
+	if err != nil {
+		return nil, fmt.Errorf("unable to build configuration from kubeconfig file, error: %w", err)
+	}
+
+	cb, err := connector.New(ctx, v.GetString(namespace.FieldName), config)
 	if err != nil {
 		l.Error("error creating connector", zap.Error(err))
 		return nil, err

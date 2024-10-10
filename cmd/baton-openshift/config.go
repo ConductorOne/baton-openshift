@@ -1,17 +1,23 @@
 package main
 
 import (
+	"errors"
+	"os"
+
 	"github.com/conductorone/baton-sdk/pkg/field"
 	"github.com/spf13/viper"
+)
+
+var (
+	kubeConfig = field.StringField("kube-config", field.WithRequired(true))
+	namespace  = field.StringField("namespace", field.WithRequired(true))
 )
 
 var (
 	// ConfigurationFields defines the external configuration required for the
 	// connector to run. Note: these fields can be marked as optional or
 	// required.
-	ConfigurationFields = []field.SchemaField{
-		field.StringField("namespace", field.WithRequired(true)),
-	}
+	ConfigurationFields = []field.SchemaField{}
 
 	// FieldRelationships defines relationships between the fields listed in
 	// ConfigurationFields that can be automatically validated. For example, a
@@ -25,5 +31,10 @@ var (
 // needs to perform extra validations that cannot be encoded with configuration
 // parameters.
 func ValidateConfig(v *viper.Viper) error {
+	kubeConfigLocation := v.GetString(kubeConfig.FieldName)
+	// check if file exists
+	if _, err := os.Stat(kubeConfigLocation); errors.Is(err, os.ErrNotExist) {
+		return err
+	}
 	return nil
 }
