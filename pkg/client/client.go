@@ -10,6 +10,7 @@ import (
 )
 
 type Client struct {
+	config      *rest.Config
 	usersClient *userv1.UserV1Client
 }
 
@@ -19,7 +20,8 @@ func New(c *rest.Config) (*Client, error) {
 		return nil, err
 	}
 
-	return &Client{usersClient: usrc}, nil
+	return &Client{usersClient: usrc, config: c}, nil
+}
 }
 
 // ListUsers list the users of the Openshift cluster
