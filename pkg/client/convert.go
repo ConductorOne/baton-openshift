@@ -30,7 +30,7 @@ func convertV1User2Resource(user v1.User) (*v2.Resource, error) {
 	profile := map[string]interface{}{
 		"name":          user.Name,
 		"generate_name": user.GenerateName,
-		"annotations":   user.Annotations,
+		//"annotations":   user.Annotations, // TODO(shackra): check the docs and parse this accordingly
 	}
 
 	traits := []rs.UserTraitOption{
