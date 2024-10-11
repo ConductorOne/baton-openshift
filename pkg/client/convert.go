@@ -48,7 +48,7 @@ func convertV1User2Resource(user v1.User) (*v2.Resource, error) {
 			},
 			Annotations: annos,
 		},
-		user.UID,
+		string(user.UID),
 		traits,
 	)
 }
