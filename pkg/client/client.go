@@ -38,8 +38,23 @@ func (c *Client) ListUsers(ctx context.Context) ([]*v2.Resource, error) {
 	}
 	users, err := convertV1Users2Resources(list.Items)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to convert []v1.User to []*v2.Resource, error: %w", err)
 	}
 
 	return users, nil
+}
+
+// ListEntitlements list the available (roles) entitlements
+func (c *Client) ListEntitlements(ctx context.Context, namespace string) ([]*v2.Resource, error) {
+	list, err := c.k8sClient.RbacV1().Roles(namespace).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to list entitlements, error: %w", err)
+	}
+
+	roles, err := convertV1RoleLists2Resources(list.Items)
+	if err != nil {
+		return nil, fmt.Errorf("unable to convert []v1.Role to []*v2.Resource, error: %w", err)
+	}
+
+	return roles, nil
 }
