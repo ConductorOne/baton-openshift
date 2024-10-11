@@ -27,7 +27,7 @@ func convertV1User2Resource(user v1.User) (*v2.Resource, error) {
 	// NOTE(shackra): Maybe this is not wanted for this case?
 	annos.Update(&v2.SkipEntitlementsAndGrants{})
 
-	profile := map[string]any{
+	profile := map[string]interface{}{
 		"name":          user.Name,
 		"generate_name": user.GenerateName,
 		"annotations":   user.Annotations,
