@@ -44,8 +44,8 @@ func (c *Client) ListUsers(ctx context.Context) ([]*v2.Resource, error) {
 	return users, nil
 }
 
-// ListEntitlements list the available (roles) entitlements
-func (c *Client) ListEntitlements(ctx context.Context, namespace string) ([]*v2.Resource, error) {
+// ListRoles list the available (roles) entitlements
+func (c *Client) ListRoles(ctx context.Context, namespace string) ([]*v2.Resource, error) {
 	list, err := c.k8sClient.RbacV1().Roles(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to list entitlements, error: %w", err)
