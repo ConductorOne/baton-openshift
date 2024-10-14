@@ -4,19 +4,18 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/conductorone/baton-openshift/pkg/client"
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
 	"github.com/conductorone/baton-sdk/pkg/annotations"
 	"github.com/conductorone/baton-sdk/pkg/pagination"
+	ent "github.com/conductorone/baton-sdk/pkg/types/entitlement"
 	rs "github.com/conductorone/baton-sdk/pkg/types/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/rest"
 )
 
 type roleBuilder struct {
 	namespace string
-	roles     *dynamic.DynamicClient
+	client    *client.Client
 }
 
 func (o *roleBuilder) ResourceType(ctx context.Context) *v2.ResourceType {
@@ -26,36 +25,43 @@ func (o *roleBuilder) ResourceType(ctx context.Context) *v2.ResourceType {
 // List returns all the roles from the database as resource objects.
 // Users include a UserTrait because they are the 'shape' of a standard user.
 func (o *roleBuilder) List(ctx context.Context, parentResourceID *v2.ResourceId, pToken *pagination.Token) ([]*v2.Resource, string, annotations.Annotations, error) {
-	roles, err := o.roles.Resource(roleOpenshiftGVR).Namespace(o.namespace).List(ctx, metav1.ListOptions{})
+	rsc, err := o.client.ListRoles(ctx, o.namespace)
 	if err != nil {
 		return nil, "", nil, err
 	}
-	list, err := convertV1Roles2Resources(roles.Items)
-	if err != nil {
-		return nil, "", nil, err
-	}
-	return list, "", nil, nil
+	return rsc, "", nil, nil
 }
 
-// TODO(shackra): figure what should I do here for roles
 func (o *roleBuilder) Entitlements(_ context.Context, resource *v2.Resource, _ *pagination.Token) ([]*v2.Entitlement, string, annotations.Annotations, error) {
-	return nil, "", nil, nil
-}
+	var rv []*v2.Entitlement
 
-// TODO(shackra): figure what should I do here for roles
-func (o *roleBuilder) Grants(ctx context.Context, resource *v2.Resource, pToken *pagination.Token) ([]*v2.Grant, string, annotations.Annotations, error) {
-	return nil, "", nil, nil
-}
-
-func newRoleBuilder(namespace string, config *rest.Config) (*roleBuilder, error) {
-	client, err := dynamic.NewForConfig(config)
-	if err != nil {
-		return nil, err
+	// NOTE(shackra): I don't really know what's needed and what
+	// is superflous
+	assigmentOptions := []ent.EntitlementOption{
+		ent.WithGrantableTo(userResourceType),
+		ent.WithDisplayName(fmt.Sprintf("%s Role member", resource.DisplayName)),
+		ent.WithDescription(fmt.Sprintf("Access to %s role in %s namespace", resource.DisplayName, o.namespace)),
 	}
+
+	rv = append(rv, ent.NewAssignmentEntitlement(
+		resource,
+		"member",
+		assigmentOptions...,
+	))
+
+	return rv, "", nil, nil
+}
+
+func (o *roleBuilder) Grants(ctx context.Context, resource *v2.Resource, pToken *pagination.Token) ([]*v2.Grant, string, annotations.Annotations, error) {
+	// TODO(shackra): figure who has what, right?
+	return nil, "", nil, nil
+}
+
+func newRoleBuilder(namespace string, clt *client.Client) *roleBuilder {
 	return &roleBuilder{
 		namespace: namespace,
-		roles:     client,
-	}, nil
+		client:    clt,
+	}
 }
 
 func convertV1Roles2Resources(roles []unstructured.Unstructured) ([]*v2.Resource, error) {
