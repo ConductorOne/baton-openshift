@@ -58,3 +58,17 @@ func (c *Client) ListRoles(ctx context.Context, namespace string) ([]*v2.Resourc
 
 	return roles, nil
 }
+
+func (c *Client) ListRoleBindings(ctx context.Context, namespace string, resource *v2.Resource) ([]*v2.Grant, error) {
+	list, err := c.k8sClient.RbacV1().RoleBindings(namespace).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to list grants, error: %w", err)
+	}
+
+	grants, err := convertV1RoleBindings2Resources(list.Items, resource)
+	if err != nil {
+		return nil, fmt.Errorf("unable to convert []v1.RoleBinding to []*v2.Grant, error: %w", err)
+	}
+
+	return grants, nil
+}
