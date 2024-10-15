@@ -52,9 +52,13 @@ func (o *roleBuilder) Entitlements(_ context.Context, resource *v2.Resource, _ *
 	return rv, "", nil, nil
 }
 
+// Grants returns all associated roles to users
 func (o *roleBuilder) Grants(ctx context.Context, resource *v2.Resource, pToken *pagination.Token) ([]*v2.Grant, string, annotations.Annotations, error) {
-	// TODO(shackra): figure who has what, right?
-	return nil, "", nil, nil
+	grants, err := o.client.ListRoleBindings(ctx, o.namespace, resource)
+	if err != nil {
+		return nil, "", nil, err
+	}
+	return grants, "", nil, nil
 }
 
 func newRoleBuilder(namespace string, clt *client.Client) *roleBuilder {
