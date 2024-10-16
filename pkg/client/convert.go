@@ -100,33 +100,37 @@ func convertV1RoleList2Resource(roleList rbacv1.Role) (*v2.Resource, error) {
 
 var roleNotGranted = errors.New("role not granted to this resource")
 
-func convertV1RoleBindings2Resources(roleBindings []rbacv1.RoleBinding, resource *v2.Resource) ([]*v2.Grant, error) {
+func convertV1RoleBindings2Resources(roleBindings []rbacv1.RoleBinding, entitlement *v2.Resource, users []*v2.Resource) ([]*v2.Grant, error) {
 	var grts []*v2.Grant
 	for _, binding := range roleBindings {
-		result, err := convertV1RoleBinding2Resource(binding, resource)
+		result, err := convertV1RoleBinding2Resource(binding, entitlement, users)
 		if err != nil {
 			if errors.Is(err, roleNotGranted) {
 				// skip
 				continue
 			}
-			return nil, fmt.Errorf("binding %s - resource %s, error: %w", binding.RoleRef.Name, resource.DisplayName, err)
+			return nil, fmt.Errorf("binding %s - resource %s, error: %w", binding.RoleRef.Name, entitlement.DisplayName, err)
 		}
 		grts = append(grts, result)
 	}
 	return grts, nil
 }
 
-func convertV1RoleBinding2Resource(roleBinding rbacv1.RoleBinding, resource *v2.Resource) (*v2.Grant, error) {
+func convertV1RoleBinding2Resource(roleBinding rbacv1.RoleBinding, entitlement *v2.Resource, users []*v2.Resource) (*v2.Grant, error) {
 	if len(roleBinding.Subjects) == 0 {
 		return nil, roleNotGranted
 	}
 
-	if resource.DisplayName == roleBinding.Subjects[0].Name {
-		return grant.NewGrant(
-			resource,
-			"member",
-			resource.Id, // NOTE(shackra): is that of the resource, right?
-		), nil
+	if roleBinding.Name == entitlement.DisplayName {
+		for _, user := range users {
+			if user.DisplayName == roleBinding.Subjects[0].Name {
+				return grant.NewGrant(
+					entitlement,
+					"member",
+					user.Id,
+				), nil
+			}
+		}
 	}
 
 	return nil, roleNotGranted
