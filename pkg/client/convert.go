@@ -3,6 +3,7 @@ package client
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
 	"github.com/conductorone/baton-sdk/pkg/annotations"
@@ -121,7 +122,11 @@ func convertV1RoleBinding2Resource(roleBinding rbacv1.RoleBinding, entitlement *
 		return nil, roleNotGranted
 	}
 
-	if roleBinding.Name == entitlement.DisplayName {
+	splittedRoleBinding := strings.Split(roleBinding.Name, "-")
+	if len(splittedRoleBinding) <= 1 {
+		return nil, roleNotGranted
+	}
+	if strings.Contains(entitlement.DisplayName, splittedRoleBinding[1]) {
 		for _, user := range users {
 			if user.DisplayName == roleBinding.Subjects[0].Name {
 				return grant.NewGrant(
