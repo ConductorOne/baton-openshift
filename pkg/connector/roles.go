@@ -54,7 +54,12 @@ func (o *roleBuilder) Entitlements(_ context.Context, resource *v2.Resource, _ *
 
 // Grants returns all associated roles to users
 func (o *roleBuilder) Grants(ctx context.Context, resource *v2.Resource, pToken *pagination.Token) ([]*v2.Grant, string, annotations.Annotations, error) {
-	grants, err := o.client.ListRoleBindings(ctx, o.namespace, resource)
+	users, err := o.client.ListUsers(ctx)
+	if err != nil {
+		return nil, "", nil, fmt.Errorf("unable to list users to match their permissions, error: %w", err)
+	}
+	// NOTE(shackra): resource is a role, not a user!
+	grants, err := o.client.ListRoleBindings(ctx, o.namespace, resource, users)
 	if err != nil {
 		return nil, "", nil, err
 	}
