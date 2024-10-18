@@ -5,6 +5,7 @@
 
   # Flake inputs
   inputs = {
+    pre-commit-hooks.url = "github:cachix/git-hooks.nix";
     flake-schemas.url = "https://flakehub.com/f/DeterminateSystems/flake-schemas/*";
 
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*";
@@ -16,6 +17,7 @@
       self,
       flake-schemas,
       nixpkgs,
+      pre-commit-hooks,
     }:
     let
       # Helpers for producing system-specific outputs
@@ -33,6 +35,8 @@
             pkgs = import nixpkgs { inherit system; };
           }
         );
+
+      ignoreFolders = [ "vendor" ];
     in
     {
       # Schemas tell Nix about the structure of your flake's outputs
@@ -43,18 +47,16 @@
         { pkgs }:
         {
           default = pkgs.mkShell {
+            buildInputs = self.checks.${pkgs.system}.pre-commit-check.enabledPackages;
+            inherit (self.checks.${pkgs.system}.pre-commit-check) shellHook;
             # Pinned packages available in the environment
             packages = with pkgs; [
-              go
               golangci-lint
-              golangci-lint-langserver
-              gopls
               jq
-              nixpkgs-fmt
               openshift # provides the `oc` command
 
               # install the binary of this project
-              self.packages.${pkgs.system}.baton-openshift
+              self.packages.${pkgs.system}.default
             ];
           };
         }
@@ -63,7 +65,7 @@
       packages = forEachSupportedSystem (
         { pkgs }:
         {
-          baton-openshift = pkgs.buildGoModule {
+          default = pkgs.buildGoModule {
             pname = "baton-openshift";
             version = "0.1.0";
 
@@ -80,8 +82,23 @@
         }
       );
 
-      defaultPackage = forEachSupportedSystem (
-        { pkgs, ... }: self.packages.${pkgs.system}.baton-openshift
+      checks = forEachSupportedSystem (
+        { pkgs }:
+        {
+          pre-commit-check = pre-commit-hooks.lib.${pkgs.system}.run {
+            src = ./.;
+            hooks = {
+              nil = {
+                enable = true;
+                excludes = ignoreFolders;
+              };
+              golangci-lint = {
+                enable = true;
+                excludes = [ "vendor" ];
+              };
+            };
+          };
+        }
       );
     };
 }
