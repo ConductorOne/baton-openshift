@@ -94,7 +94,15 @@
               };
               golangci-lint = {
                 enable = true;
-                excludes = [ "vendor" ];
+                excludes = ignoreFolders;
+              };
+              gotest = {
+                enable = true;
+                excludes = ignoreFolders;
+              };
+              yamllint = {
+                enable = true;
+                excludes = ignoreFolders;
               };
             };
           };
