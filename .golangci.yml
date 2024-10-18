@@ -102,3 +102,9 @@ issues:
     # Don't require TODO comments to end in a period
     - source: "(TODO)"
       linters: [ godot ]
+
+output:
+  formats:
+    - format: colored-tab
+      path: stdout
+  print-issue-lines: true
