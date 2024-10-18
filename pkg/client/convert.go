@@ -178,7 +178,7 @@ func convertV1Group2Resource(group v1.Group) (*v2.Resource, error) {
 				v2.ResourceType_TRAIT_GROUP,
 			},
 		},
-		group.UID,
+		string(group.UID),
 		traits,
 	)
 }
