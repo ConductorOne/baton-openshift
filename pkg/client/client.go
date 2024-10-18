@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
+	"github.com/conductorone/baton-sdk/pkg/types/grant"
 	userv1 "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -71,4 +72,42 @@ func (c *Client) ListRoleBindings(ctx context.Context, namespace string, entitle
 	}
 
 	return grants, nil
+}
+
+func (c *Client) ListGroups(ctx context.Context) ([]*v2.Resource, error) {
+	list, err := c.usersClient.Groups().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	groups, err := convertV1Groups2Resources(list.Items)
+	if err != nil {
+		return nil, fmt.Errorf("unable to convert []v1.Group to []*v2.Resource, error: %w", err)
+	}
+
+	return groups, nil
+}
+
+func (c *Client) MatchUsersToGroup(ctx context.Context, entitlement *v2.Resource, users []*v2.Resource) ([]*v2.Grant, error) {
+	var gnts []*v2.Grant
+
+	list, err := c.usersClient.Groups().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	for _, group := range list.Items {
+		// match a group with the entitlement
+		if entitlement.Id.String() == string(group.UID) {
+			for _, user := range users {
+				for _, member := range group.Users {
+					// NOTE(shackra): 3 levels of for-loops isn't that performing! right?
+					if user.DisplayName == member {
+						gnts = append(gnts, grant.NewGrant(entitlement, "member", user.Id))
+					}
+				}
+			}
+		}
+	}
+
+	return gnts, nil
 }

@@ -23,16 +23,3 @@ var roleResourceType = &v2.ResourceType{
 	DisplayName: "Role",
 	Traits:      []v2.ResourceType_Trait{v2.ResourceType_TRAIT_ROLE},
 }
-
-// Openshift related
-var groupOpenshiftGVR = schema.GroupVersionResource{
-	Group:    "user.openshift.io",
-	Version:  "v1",
-	Resource: "groups",
-}
-
-var roleOpenshiftGVR = schema.GroupVersionResource{
-	Group:    "rbac.authorization.k8s.io",
-	Version:  "v1",
-	Resource: "roles",
-}

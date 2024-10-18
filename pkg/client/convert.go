@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
 	"github.com/conductorone/baton-sdk/pkg/annotations"
@@ -99,7 +100,10 @@ func convertV1RoleList2Resource(roleList rbacv1.Role) (*v2.Resource, error) {
 	)
 }
 
-var roleNotGranted = errors.New("role not granted to this resource")
+var (
+	roleNotGranted    = errors.New("role not granted to this resource")
+	notAMemberOfGroup = errors.New("user is not part of this group")
+)
 
 func convertV1RoleBindings2Resources(roleBindings []rbacv1.RoleBinding, entitlement *v2.Resource, users []*v2.Resource) ([]*v2.Grant, error) {
 	var grts []*v2.Grant
@@ -139,4 +143,42 @@ func convertV1RoleBinding2Resource(roleBinding rbacv1.RoleBinding, entitlement *
 	}
 
 	return nil, roleNotGranted
+}
+
+func convertV1Groups2Resources(groups []v1.Group) ([]*v2.Resource, error) {
+	var rsc []*v2.Resource
+	for _, group := range groups {
+		result, err := convertV1Group2Resource(group)
+		if err != nil {
+			return nil, fmt.Errorf("resource %s, error: %w", group.GetUID(), err)
+		}
+		rsc = append(rsc, result)
+	}
+
+	return rsc, nil
+}
+
+func convertV1Group2Resource(group v1.Group) (*v2.Resource, error) {
+	profile := map[string]any{
+		"name":          group.GetName(),
+		"generate_name": group.GetGenerateName(),
+		"created_at":    group.CreationTimestamp.Format(time.RFC3339),
+	}
+
+	traits := []rs.GroupTraitOption{
+		rs.WithGroupProfile(profile),
+	}
+
+	return rs.NewGroupResource(
+		group.GetName(),
+		&v2.ResourceType{
+			Id:          "group",
+			DisplayName: "Group",
+			Traits: []v2.ResourceType_Trait{
+				v2.ResourceType_TRAIT_GROUP,
+			},
+		},
+		group.UID,
+		traits,
+	)
 }
