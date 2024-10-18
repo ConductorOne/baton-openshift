@@ -107,4 +107,4 @@ output:
   formats:
     - format: colored-tab
       path: stdout
-  print-issue-lines: true
+  print-issued-lines: true
