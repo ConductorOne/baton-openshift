@@ -20,8 +20,6 @@ func (o *roleBuilder) ResourceType(ctx context.Context) *v2.ResourceType {
 	return roleResourceType
 }
 
-// List returns all the roles from the database as resource objects.
-// Users include a UserTrait because they are the 'shape' of a standard user.
 func (o *roleBuilder) List(ctx context.Context, parentResourceID *v2.ResourceId, pToken *pagination.Token) ([]*v2.Resource, string, annotations.Annotations, error) {
 	rsc, err := o.client.ListRoles(ctx, o.namespace)
 	if err != nil {
@@ -50,7 +48,6 @@ func (o *roleBuilder) Entitlements(_ context.Context, resource *v2.Resource, _ *
 	return rv, "", nil, nil
 }
 
-// Grants returns all associated roles to users
 func (o *roleBuilder) Grants(ctx context.Context, resource *v2.Resource, pToken *pagination.Token) ([]*v2.Grant, string, annotations.Annotations, error) {
 	users, err := o.client.ListUsers(ctx)
 	if err != nil {

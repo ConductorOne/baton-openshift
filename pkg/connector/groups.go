@@ -20,7 +20,6 @@ func (o *groupBuilder) ResourceType(ctx context.Context) *v2.ResourceType {
 	return groupResourceType
 }
 
-// List returns all the groups from the database as resource objects.
 func (o *groupBuilder) List(ctx context.Context, parentResourceID *v2.ResourceId, pToken *pagination.Token) ([]*v2.Resource, string, annotations.Annotations, error) {
 	groups, err := o.client.ListGroups(ctx)
 	if err != nil {
