@@ -46,7 +46,7 @@ func main() {
 func getConnector(ctx context.Context, v *viper.Viper) (types.ConnectorServer, error) {
 	l := ctxzap.Extract(ctx)
 	if err := ValidateConfig(v); err != nil {
-		return nil, fmt.Errorf("invalid configuration: %v", err)
+		return nil, fmt.Errorf("invalid configuration: %w", err)
 	}
 
 	config, err := clientcmd.BuildConfigFromFlags("", v.GetString(kubeConfig.FieldName))

@@ -13,7 +13,7 @@ import (
 )
 
 // Client is an abstraction that sits between Openshift/Kubernetes Go
-// API client and the Baton connector code needed by Baton SDK
+// API client and the Baton connector code needed by Baton SDK.
 type Client struct {
 	usersClient *userv1.UserV1Client
 	k8sClient   *kubernetes.Clientset
@@ -32,7 +32,7 @@ func New(c *rest.Config) (*Client, error) {
 	return &Client{usersClient: usrc, k8sClient: k8sc}, nil
 }
 
-// ListUsers list the users of the Openshift cluster
+// ListUsers list the users of the Openshift cluster.
 func (c *Client) ListUsers(ctx context.Context) ([]*v2.Resource, error) {
 	list, err := c.usersClient.Users().List(ctx, metav1.ListOptions{})
 	if err != nil {
@@ -46,7 +46,7 @@ func (c *Client) ListUsers(ctx context.Context) ([]*v2.Resource, error) {
 	return users, nil
 }
 
-// ListRoles list the available (roles) entitlements in a namespace
+// ListRoles list the available (roles) entitlements in a namespace.
 func (c *Client) ListRoles(ctx context.Context, namespace string) ([]*v2.Resource, error) {
 	list, err := c.k8sClient.RbacV1().Roles(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
@@ -61,7 +61,7 @@ func (c *Client) ListRoles(ctx context.Context, namespace string) ([]*v2.Resourc
 	return roles, nil
 }
 
-// ListRoleBindings matches a user with a role (rolebinding) in a namespace
+// ListRoleBindings matches a user with a role (rolebinding) in a namespace.
 func (c *Client) ListRoleBindings(ctx context.Context, namespace string, entitlement *v2.Resource, users []*v2.Resource) ([]*v2.Grant, error) {
 	list, err := c.k8sClient.RbacV1().RoleBindings(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
@@ -76,7 +76,7 @@ func (c *Client) ListRoleBindings(ctx context.Context, namespace string, entitle
 	return grants, nil
 }
 
-// ListGroups list all available groups on the Openshift cluster
+// ListGroups list all available groups on the Openshift cluster.
 func (c *Client) ListGroups(ctx context.Context) ([]*v2.Resource, error) {
 	list, err := c.usersClient.Groups().List(ctx, metav1.ListOptions{})
 	if err != nil {
@@ -91,7 +91,7 @@ func (c *Client) ListGroups(ctx context.Context) ([]*v2.Resource, error) {
 	return groups, nil
 }
 
-// MatchUsersToGroup matches what users belong to which groups
+// MatchUsersToGroup matches what users belong to which groups.
 func (c *Client) MatchUsersToGroup(ctx context.Context, entitlement *v2.Resource, users []*v2.Resource) ([]*v2.Grant, error) {
 	var gnts []*v2.Grant
 

@@ -21,7 +21,7 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 )
 
-// convertV1Users2Resources (plural) convert users of Openshift to resources of Baton SDK
+// convertV1Users2Resources (plural) convert users of Openshift to resources of Baton SDK.
 func convertV1Users2Resources(users []v1.User) ([]*v2.Resource, error) {
 	var rsc []*v2.Resource
 	for _, user := range users {
@@ -35,7 +35,7 @@ func convertV1Users2Resources(users []v1.User) ([]*v2.Resource, error) {
 	return rsc, nil
 }
 
-// convertV1User2Resource (singular) convert a user to a resource, use by `convertV1Users2Resources`
+// convertV1User2Resource (singular) convert a user to a resource, use by `convertV1Users2Resources`.
 func convertV1User2Resource(user v1.User) (*v2.Resource, error) {
 	annos := annotations.Annotations{}
 	annos.Update(&v2.SkipEntitlementsAndGrants{})
@@ -65,7 +65,7 @@ func convertV1User2Resource(user v1.User) (*v2.Resource, error) {
 	)
 }
 
-// convertV1RoleLists2Resources (plural) convert a list of roles of Openshift to resources of Baton SDK
+// convertV1RoleLists2Resources (plural) convert a list of roles of Openshift to resources of Baton SDK.
 func convertV1RoleLists2Resources(roleLists []rbacv1.Role) ([]*v2.Resource, error) {
 	var rsc []*v2.Resource
 	for _, role := range roleLists {
@@ -79,7 +79,7 @@ func convertV1RoleLists2Resources(roleLists []rbacv1.Role) ([]*v2.Resource, erro
 	return rsc, nil
 }
 
-// convertV1RoleList2Resource (singular) convert a role to a resource, use by `convertV1RoleLists2Resources`
+// convertV1RoleList2Resource (singular) convert a role to a resource, use by `convertV1RoleLists2Resources`.
 func convertV1RoleList2Resource(roleList rbacv1.Role) (*v2.Resource, error) {
 	annos := annotations.Annotations{}
 	annos.Update(&v2.SkipEntitlementsAndGrants{})
@@ -155,7 +155,7 @@ func convertV1RoleBinding2Resource(roleBinding rbacv1.RoleBinding, entitlement *
 	return nil, roleNotGranted
 }
 
-// convertV1Groups2Resources (plural) convert a list of groups of Openshift to resources of Baton SDK
+// convertV1Groups2Resources (plural) convert a list of groups of Openshift to resources of Baton SDK.
 func convertV1Groups2Resources(groups []v1.Group) ([]*v2.Resource, error) {
 	var rsc []*v2.Resource
 	for _, group := range groups {
@@ -169,7 +169,7 @@ func convertV1Groups2Resources(groups []v1.Group) ([]*v2.Resource, error) {
 	return rsc, nil
 }
 
-// convertV1Group2Resource (singular) convert a group into a resource, use by `convertV1Groups2Resources`
+// convertV1Group2Resource (singular) convert a group into a resource, use by `convertV1Groups2Resources`.
 func convertV1Group2Resource(group v1.Group) (*v2.Resource, error) {
 	profile := map[string]any{
 		"name":          group.GetName(),
