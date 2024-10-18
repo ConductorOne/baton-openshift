@@ -97,7 +97,7 @@ func (c *Client) MatchUsersToGroup(ctx context.Context, entitlement *v2.Resource
 	}
 	for _, group := range list.Items {
 		// match a group with the entitlement
-		if entitlement.Id.String() == string(group.UID) {
+		if entitlement.Id.Resource == string(group.UID) {
 			for _, user := range users {
 				for _, member := range group.Users {
 					// NOTE(shackra): 3 levels of for-loops isn't that performing! right?
