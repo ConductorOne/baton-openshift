@@ -2,7 +2,6 @@ package connector
 
 import (
 	v2 "github.com/conductorone/baton-sdk/pb/c1/connector/v2"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // The user resource type is for all user objects from the database.
