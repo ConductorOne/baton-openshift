@@ -50,14 +50,17 @@
             buildInputs = self.checks.${pkgs.system}.pre-commit-check.enabledPackages;
             inherit (self.checks.${pkgs.system}.pre-commit-check) shellHook;
             # Pinned packages available in the environment
-            packages = with pkgs; [
-              golangci-lint
-              jq
-              openshift # provides the `oc` command
+            packages =
+              with pkgs;
+              [
+                golangci-lint
+                jq
+                openshift # provides the `oc` command
 
-              # install the binary of this project
-              self.packages.${pkgs.system}.default
-            ];
+                # install the binary of this project
+                self.packages.${pkgs.system}.default
+              ] # also make available all packages used by pre-commit-check
+              ++ self.checks.${pkgs.system}.pre-commit-check.enabledPackages;
           };
         }
       );
