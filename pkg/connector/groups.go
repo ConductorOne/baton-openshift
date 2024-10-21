@@ -33,8 +33,8 @@ func (o *groupBuilder) Entitlements(_ context.Context, resource *v2.Resource, _ 
 
 	assigmentOptions := []ent.EntitlementOption{
 		ent.WithGrantableTo(userResourceType),
-		ent.WithDisplayName(fmt.Sprintf("%s Group member", resource.DisplayName)),
-		ent.WithDescription(fmt.Sprintf("Access to %s group", resource.DisplayName)),
+		ent.WithDisplayName(fmt.Sprintf("%s Team member", resource.DisplayName)),
+		ent.WithDescription(fmt.Sprintf("Access to %s team", resource.DisplayName)),
 	}
 
 	rv = append(rv, ent.NewAssignmentEntitlement(

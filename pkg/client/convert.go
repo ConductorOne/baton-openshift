@@ -185,7 +185,7 @@ func convertV1Group2Resource(group v1.Group) (*v2.Resource, error) {
 		group.GetName(),
 		&v2.ResourceType{
 			Id:          "group",
-			DisplayName: "Group",
+			DisplayName: "Team",
 			Traits: []v2.ResourceType_Trait{
 				v2.ResourceType_TRAIT_GROUP,
 			},
