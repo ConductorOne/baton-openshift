@@ -16,10 +16,25 @@ baton-openshift
 baton resources
 ```
 
+## Requirements
+
+This connector uses your kube-config file. When you use `oc` to authenticate into the cluster, this kube-config file is updated for you. Thus, run:
+
+```
+oc login -u <your-user> https://<host-for-your-cluster>:6443
+```
+
+Now you can synchronize the users of the cluster and their roles for a given namespace and groups:
+
+```
+baton-openshift --kube-config /home/example/.kube/config --namespace example-namespace
+```
+
 ## docker
 
 ```
-docker run --rm -v $(pwd):/out -e BATON_DOMAIN_URL=domain_url -e BATON_API_KEY=apiKey -e BATON_USERNAME=username ghcr.io/conductorone/baton-openshift:latest -f "/out/sync.c1z"
+docker run --rm -v $(pwd):/out -v /home/example/.kube/config:/user/config -e BATON_DOMAIN_URL=domain_url -e BATON_API_KEY=apiKey -e BATON_USERNAME=username ghcr.io/conductorone/baton-openshift:latest -f "/out/sync.c1z --kube-config /user/config --namespace example-namespace"
+
 docker run --rm -v $(pwd):/out ghcr.io/conductorone/baton:latest -f "/out/sync.c1z" resources
 ```
 
