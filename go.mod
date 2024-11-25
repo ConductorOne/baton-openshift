@@ -3,7 +3,7 @@ module github.com/conductorone/baton-openshift
 go 1.22.7
 
 require (
-	github.com/conductorone/baton-sdk v0.2.45
+	github.com/conductorone/baton-sdk v0.2.46
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/openshift/api v0.0.0-20240906165951-d73f2e11e0be
 	github.com/openshift/client-go v0.0.0-20240906181530-b2f7c4ab0984
