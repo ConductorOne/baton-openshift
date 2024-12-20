@@ -5,6 +5,7 @@
 
   # Flake inputs
   inputs = {
+    baton.url = "github:conductorOne/baton";
     pre-commit-hooks.url = "github:cachix/git-hooks.nix";
     flake-schemas.url = "https://flakehub.com/f/DeterminateSystems/flake-schemas/*";
 
@@ -18,6 +19,7 @@
       flake-schemas,
       nixpkgs,
       pre-commit-hooks,
+      baton,
     }:
     let
       # Helpers for producing system-specific outputs
@@ -57,6 +59,7 @@
                 jq
                 openshift # provides the `oc` command
 
+                baton.packages.${pkgs.system}.default
                 # install the binary of this project
                 self.packages.${pkgs.system}.default
               ] # also make available all packages used by pre-commit-check
