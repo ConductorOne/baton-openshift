@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	kubeConfig = field.StringField("kube-config", field.WithRequired(true))
+	kubeConfig = field.StringField("kube-config", field.WithRequired(false))
 	namespace  = field.StringField("namespace", field.WithRequired(true))
 )
 
