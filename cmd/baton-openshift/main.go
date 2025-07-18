@@ -13,7 +13,6 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -47,13 +46,22 @@ func main() {
 
 func getConnector(ctx context.Context, v *viper.Viper) (types.ConnectorServer, error) {
 	l := ctxzap.Extract(ctx)
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		l.Log(zapcore.InfoLevel, "not running in cluster")
-		if err := ValidateConfig(v); err != nil {
-			return nil, fmt.Errorf("invalid configuration: %w", err)
+
+	if err := ValidateConfig(v); err != nil {
+		return nil, fmt.Errorf("invalid configuration: %w", err)
+	}
+
+	var config *rest.Config
+	var err error
+	kubeConfigPath := v.GetString(kubeConfig.FieldName)
+	if kubeConfigPath == "" {
+		l.Debug("no kubeconfig file specified. trying in-cluster config")
+		config, err = rest.InClusterConfig()
+		if err != nil {
+			return nil, fmt.Errorf("unable to build configuration from in-cluster config, error: %w", err)
 		}
-		config, err = clientcmd.BuildConfigFromFlags("", v.GetString(kubeConfig.FieldName))
+	} else {
+		config, err = clientcmd.BuildConfigFromFlags("", kubeConfigPath)
 		if err != nil {
 			return nil, fmt.Errorf("unable to build configuration from kubeconfig file, error: %w", err)
 		}
@@ -64,10 +72,11 @@ func getConnector(ctx context.Context, v *viper.Viper) (types.ConnectorServer, e
 		l.Error("error creating connector", zap.Error(err))
 		return nil, err
 	}
-	connector, err := connectorbuilder.NewConnector(ctx, cb)
+
+	connectorServer, err := connectorbuilder.NewConnector(ctx, cb)
 	if err != nil {
 		l.Error("error creating connector", zap.Error(err))
 		return nil, err
 	}
-	return connector, nil
+	return connectorServer, nil
 }
