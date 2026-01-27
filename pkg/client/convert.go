@@ -109,7 +109,7 @@ func convertV1RoleList2Resource(roleList rbacv1.Role) (*v2.Resource, error) {
 	)
 }
 
-var roleNotGranted = errors.New("role not granted to this resource")
+var errRoleNotGranted = errors.New("role not granted to this resource")
 
 // convertV1RoleBindings2Resources (plural) convert role bindings of Openshift to grants of Baton SDK.
 // for a given entitlement and a  list of user resources.
@@ -118,7 +118,7 @@ func convertV1RoleBindings2Resources(roleBindings []rbacv1.RoleBinding, entitlem
 	for _, binding := range roleBindings {
 		result, err := convertV1RoleBinding2Resource(binding, entitlement, users)
 		if err != nil {
-			if errors.Is(err, roleNotGranted) {
+			if errors.Is(err, errRoleNotGranted) {
 				// skip
 				continue
 			}
@@ -133,12 +133,12 @@ func convertV1RoleBindings2Resources(roleBindings []rbacv1.RoleBinding, entitlem
 // use by `convertV1RoleBindings2Resources`.
 func convertV1RoleBinding2Resource(roleBinding rbacv1.RoleBinding, entitlement *v2.Resource, users []*v2.Resource) (*v2.Grant, error) {
 	if len(roleBinding.Subjects) == 0 {
-		return nil, roleNotGranted
+		return nil, errRoleNotGranted
 	}
 
 	splittedRoleBinding := strings.Split(roleBinding.Name, "-")
 	if len(splittedRoleBinding) <= 1 {
-		return nil, roleNotGranted
+		return nil, errRoleNotGranted
 	}
 	if strings.Contains(entitlement.DisplayName, splittedRoleBinding[1]) {
 		for _, user := range users {
@@ -152,7 +152,7 @@ func convertV1RoleBinding2Resource(roleBinding rbacv1.RoleBinding, entitlement *
 		}
 	}
 
-	return nil, roleNotGranted
+	return nil, errRoleNotGranted
 }
 
 // convertV1Groups2Resources (plural) convert a list of groups of Openshift to resources of Baton SDK.
