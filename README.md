@@ -1,6 +1,6 @@
 ![Baton Logo](./docs/images/baton-logo.png)
 
-# `baton-openshift` [![Go Reference](https://pkg.go.dev/badge/github.com/conductorone/baton-openshift.svg)](https://pkg.go.dev/github.com/conductorone/baton-openshift) ![main ci](https://github.com/conductorone/baton-openshift/actions/workflows/main.yaml/badge.svg)
+# `baton-openshift` [![Go Reference](https://pkg.go.dev/badge/github.com/conductorone/baton-openshift.svg)](https://pkg.go.dev/github.com/conductorone/baton-openshift) ![ci](https://github.com/conductorone/baton-openshift/actions/workflows/ci.yaml/badge.svg) ![verify](https://github.com/conductorone/baton-openshift/actions/workflows/verify.yaml/badge.svg)
 
 `baton-openshift` is a connector for built using the [Baton SDK](https://github.com/conductorone/baton-sdk).
 
