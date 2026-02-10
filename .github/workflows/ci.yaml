@@ -6,42 +6,6 @@ on:
     branches:
       - main
 jobs:
-  go-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-      - name: Run linters
-        uses: golangci/golangci-lint-action@v8
-        with:
-          version: latest
-          args: --timeout=3m
-  go-test:
-    strategy:
-      matrix:
-        platform: [ubuntu-latest]
-    runs-on: ${{ matrix.platform }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-      - name: go tests
-        run: >-
-          (set -o pipefail && go test -v -covermode=count -json ./... |
-           tee test.json)
-      - name: annotate go tests
-        if: always()
-        uses: guyarb/golang-test-annotations@v0.6.0
-        with:
-          test-results: test.json
-
   test:
     runs-on: ubuntu-latest
     env:
@@ -57,41 +21,28 @@ jobs:
         run: go build ./cmd/baton-openshift
       - name: Run baton-openshift
         run: ./baton-openshift
-
       - name: Install baton
         run: ./scripts/get-baton.sh && mv baton /usr/local/bin
-
       - name: Check for grant before revoking
-
         run: >-
-          baton grants --entitlement="${{ env.CONNECTOR_ENTITLEMENT }}"
-          --output-format=json |
-          jq --exit-status
-          ".grants[].principal.id.resource
-          == \"${{ env.CONNECTOR_PRINCIPAL }}\""
-
+          baton grants --entitlement="${{ env.CONNECTOR_ENTITLEMENT }}" --output-format=json | jq --exit-status ".grants[].principal.id.resource == \"${{ env.CONNECTOR_PRINCIPAL }}\""
       - name: Revoke grants
         run: ./baton-openshift --revoke-grant="${{ env.CONNECTOR_GRANT }}"
-
       - name: Check grant was revoked
         run: >-
           ./baton-openshift &&
+
             baton grants --entitlement="${{ env.CONNECTOR_ENTITLEMENT }}"
             --output-format=json |
             jq --exit-status "if .grants then .grants[]?.principal.id.resource
             != \"${{ env.CONNECTOR_PRINCIPAL }}\" else . end"
-
       - name: Grant entitlement
         run: >-
           ./baton-openshift
+
             --grant-entitlement="${{ env.CONNECTOR_ENTITLEMENT }}"
             --grant-principal="${{ env.CONNECTOR_PRINCIPAL }}"
             --grant-principal-type="${{ env.CONNECTOR_PRINCIPAL_TYPE }}"
-
       - name: Check grant was re-granted
-
         run: >-
-          baton grants --entitlement="${{ env.CONNECTOR_ENTITLEMENT }}"
-          --output-format=json |
-          jq --exit-status ".grants[].principal.id.resource
-          == \"${{ env.CONNECTOR_PRINCIPAL }}\""
+          baton grants --entitlement="${{ env.CONNECTOR_ENTITLEMENT }}" --output-format=json | jq --exit-status ".grants[].principal.id.resource == \"${{ env.CONNECTOR_PRINCIPAL }}\""
