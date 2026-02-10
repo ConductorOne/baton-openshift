@@ -4,9 +4,11 @@ go 1.25.2
 
 require (
 	github.com/conductorone/baton-sdk v0.7.16
+	github.com/ennyjfrick/ruleguard-logfatal v0.0.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/openshift/api v0.0.0-20240906165951-d73f2e11e0be
 	github.com/openshift/client-go v0.0.0-20240906181530-b2f7c4ab0984
+	github.com/quasilyte/go-ruleguard/dsl v0.3.23
 	go.uber.org/zap v1.27.1
 	k8s.io/api v0.30.1
 	k8s.io/apimachinery v0.30.1

@@ -1,6 +1,14 @@
-//go:build ignore
+//go:build ruleguard
+// +build ruleguard
 
 package gorules
 
-// This file is intentionally empty to satisfy the ruleguard linter configuration.
-// Add custom ruleguard rules here if needed.
+import (
+	"github.com/quasilyte/go-ruleguard/dsl"
+
+	logfatalrules "github.com/ennyjfrick/ruleguard-logfatal"
+)
+
+func init() {
+	dsl.ImportRules("logfatal", logfatalrules.Bundle) // checks for uses of log.Fatal or log.Panic
+}
