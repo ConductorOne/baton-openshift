@@ -45,10 +45,7 @@ func convertV1User2Resource(user v1.User) (*v2.Resource, error) {
 		"generate_name": user.GenerateName,
 	}
 
-	traits := []rs.UserTraitOption{
-		rs.WithUserProfile(profile),
-		rs.WithCreatedAt(user.CreationTimestamp.Time),
-	}
+	traits := []rs.UserTraitOption{}
 
 	return rs.NewUserResource(
 		user.Name,
@@ -62,6 +59,8 @@ func convertV1User2Resource(user v1.User) (*v2.Resource, error) {
 		},
 		string(user.UID),
 		traits,
+		rs.WithResourceProfile(profile),
+		rs.WithResourceCreatedAt(user.CreationTimestamp.Time),
 	)
 }
 
@@ -90,7 +89,6 @@ func convertV1RoleList2Resource(roleList rbacv1.Role) (*v2.Resource, error) {
 	}
 
 	traits := []rs.RoleTraitOption{
-		rs.WithRoleProfile(profile),
 		// FIXME(shackra): add creation time
 	}
 
@@ -106,6 +104,7 @@ func convertV1RoleList2Resource(roleList rbacv1.Role) (*v2.Resource, error) {
 		},
 		string(roleList.UID),
 		traits,
+		rs.WithResourceProfile(profile),
 	)
 }
 
@@ -177,9 +176,7 @@ func convertV1Group2Resource(group v1.Group) (*v2.Resource, error) {
 		"created_at":    group.CreationTimestamp.Format(time.RFC3339),
 	}
 
-	traits := []rs.GroupTraitOption{
-		rs.WithGroupProfile(profile),
-	}
+	traits := []rs.GroupTraitOption{}
 
 	return rs.NewGroupResource(
 		group.GetName(),
@@ -192,5 +189,6 @@ func convertV1Group2Resource(group v1.Group) (*v2.Resource, error) {
 		},
 		string(group.UID),
 		traits,
+		rs.WithResourceProfile(profile),
 	)
 }
